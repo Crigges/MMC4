@@ -7,14 +7,19 @@ package Main
 	import Helper
 	import ClosureTimers
 	
-	public HashMap<unit, Unit> heros = new HashMap<unit, Unit>()
+	public HashMap<unit, Unit> units = new HashMap<unit, Unit>()
 	public force allPlayer = CreateForce()
 	public trigger death = CreateTrigger()..addAction(function handleDeath)
 	int lives = 20
 	leaderboard lb
 	
+	function createHero(player p, vec2 pos, real angle) returns Unit
+		unit u = CreateUnit(p, 'h000', pos.x, pos.y, angle)
+		u.addAbility('rami')
+		return new Unit(u)
+		
 	function handleDeath()
-		Unit h = heros.get(GetTriggerUnit())
+		Unit h = units.get(GetTriggerUnit())
 		if h != null
 			ReviveHero(h.u, h.startPos.x, h.startPos.y, true)
 			LeaderboardSetPlayerItemValueBJ(h.u.getOwner(), lb, lives)
@@ -33,7 +38,7 @@ package Main
 		
 		construct(unit u)
 			this.u = u
-			heros.put(u, this)
+			units.put(u, this)
 			startPos = u.getPos()
 			
 		function addKnock(vec2 impuls)
@@ -83,18 +88,16 @@ package Main
 				group g = CreateGroup()
 				GroupEnumUnitsInRange(g, next.x, next.y, 100, null)
 				unit u = FirstOfGroup(g)
-				if u != null and curr.lastCollision != heros.get(u)
-					curr.collision(heros.get(u))
+				if u != null and curr.lastCollision != units.get(u)
+					curr.collision(units.get(u))
 				curr.knock = curr.knock * 0.95
 				curr = curr.next
 				DestroyGroup(g)
 
 	init
-		print("asdf")
 		death.registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
 		FogEnableOff()
 		FogMaskEnableOff()
-		print("jklö")
 		getTimer().startPeriodic(0.03, function  Unit.knockback)
 		int amount = 0
 		for int i = 0 to 11
@@ -103,8 +106,8 @@ package Main
 		for int i = 0 to 11
 			if GetPlayerSlotState(Player(i)) == PLAYER_SLOT_STATE_PLAYING
 				vec2 pos = gg_rct_Gebiet_000.getCenter().polarOffset(((360/amount) * i).asAngleDegrees(), 1100)
-				new Unit(CreateUnit(Player(i), 'h000', pos.x, pos.y, ((360/amount) * i) + 180))
-				print("created")
+				createHero(Player(i), pos, ((360/amount) * i) + 180)
+				
 		getTimer().start(0.0, function lb)
 		doPeriodically(0.03, (CallbackPeriodic b) -> SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, 2500, 0))
 				
