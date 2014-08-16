@@ -109,7 +109,6 @@ package Main
 				createHero(Player(i), pos, ((360/amount) * i) + 180)
 				
 		getTimer().start(0.0, function lb)
-		doPeriodically(0.03, (CallbackPeriodic b) -> SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, 2500, 0))
 				
 	function lb()
 		lb = CreateLeaderboard()

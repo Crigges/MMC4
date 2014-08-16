@@ -1,0 +1,32 @@
+package UnitMove
+import Main
+import LinkedListModule
+import ClosureTimers
+
+public class MoveUnit
+	use LinkedListModule
+	Unit u
+	real speed = 0.1
+	
+	construct(Unit u)
+		doAfter(0.1, () -> SetUnitAnimationByIndex(u.u, 12))
+		this.u = u
+		
+	static function move()
+		MoveUnit m = first
+		while m != null
+			m.u.addKnock(vec2(0, 0).polarOffset(m.u.u.getPos().angleTo(gg_unit_hcas_0028.getPos()), m.speed))
+			m.u.u.setFacing(m.u.u.getPos().angleTo(gg_unit_hcas_0028.getPos()))
+			m.u.u.setTimeScale(m.speed / 4)
+			m.speed += 0.04
+			m = m.next
+			
+init
+	SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, 2500, 0)
+	getTimer().startPeriodic(0.3, function MoveUnit.move)
+	doPeriodically(5, (CallbackPeriodic cb) -> begin
+		if gg_unit_hcas_0028 == null
+			print("null")
+		new MoveUnit(new Unit(CreateUnit(Player(12), 'h001', gg_rct_Gebiet_000.getCenterX() + GetRandomReal(-200, 200), gg_rct_Gebiet_000.getCenterY() + GetRandomReal(-200, 200), 0)))
+	end)
+	
