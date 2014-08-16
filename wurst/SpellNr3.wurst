@@ -1,0 +1,55 @@
+package SpellNr3
+
+import Main
+import ChannelAbilityPreset
+import ClosureEvents
+import Fx
+
+@compiletime function createSpell()
+	var def = new ChannelAbilityPreset('ramW', 10)
+	def.setLevels(1)
+	def.removeChannelProperties(true)
+	def.setHotkeyNormal("W")
+	def.presetButtonPosNormal(0, 2)
+	def.setTooltipNormal(1, "Stomp [W]")
+	def.setTooltipNormalExtended(1, "Stomps to the ground, causing a huge knockback around the caster")
+	def.setIconNormal("ReplaceableTextures\\CommandButtons\\BTNEarthquake.blp")
+	def.presetTargetTypes(Targettype.NOTARGET)
+	def.presetFollowThroughTime((int i) -> 0)
+	def.setName("Stomp")
+	def.setLevelSkipRequirement(0)
+	def.setRequiredLevel(0)
+	def.setCooldown(1, 2)
+	def.setCastRange(1, 1000)
+	def.setManaCost(1, 0)
+	
+init
+	onPointCast('ramW', (unit u, int lvl, vec2 pos) -> new Stomp(units.get(u)))
+	
+class Stomp
+	
+	Fx dummy
+	
+	static constant real knockbackFactor = 1
+	static constant real stompRange = 800
+	static constant real dummyHeight = 20
+	
+	construct(Unit caster)
+		dummy = new Fx(caster.u.getPos().withZ(dummyHeight), caster.u.getFacingAngle(), "Abilities\\Spells\\Orc\\AncestralSpirit\\AncestralSpiritCaster.mdl")
+		ENUM_GROUP.enumUnitsInRange(caster.u.getPos(), stompRange)
+		for unit u in ENUM_GROUP
+			if u.getOwner().isEnemyOf(caster.u.getOwner())
+				real knockbackrelativ = (caster.u.getPos().distToVec(u.getPos()) - (stompRange)).abs() / 3
+				units.get(u).addKnock(vec2(0,0).polarOffset(caster.u.getPos().angleTo(u.getPos()), knockbackFactor * knockbackrelativ))
+		timer t = getTimer()
+				..setData(this castTo int)
+				..start(3, () -> GetExpiredTimer().getData()	castTo thistype.destroyDummy())
+
+
+	function destroyDummy()
+		destroy this
+		
+	ondestroy
+		destroy dummy
+
+endpackage

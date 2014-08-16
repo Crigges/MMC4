@@ -6,7 +6,7 @@ import ClosureEvents
 import Main
 
 @compiletime function createSpell()
-	var def = new ChannelAbilityPreset('rami', 10)
+	var def = new ChannelAbilityPreset('ramD', 10)
 	def.setLevels(1)
 	def.removeChannelProperties(true)
 	def.setHotkeyNormal("D")
@@ -24,7 +24,7 @@ import Main
 	def.setManaCost(1, 0)
 		
 init
-	onPointCast('rami', (unit u, int lvl, vec2 pos) -> new Conductor(u, pos))
+	onPointCast('ramD', (unit u, int lvl, vec2 pos) -> new Conductor(u, pos))
 
 public class Conductor
 	static constant real range = 900

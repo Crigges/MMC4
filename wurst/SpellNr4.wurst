@@ -1,0 +1,19 @@
+package SpellNr4
+
+import Main
+import Fx
+
+
+class UsamaBinLaden
+	
+	static constant real usamaHeight = 50
+	
+	Unit caster
+	Fx dummy
+	
+//	construct(Unit caster)
+//		this.caster = caster
+//		vec2 pos = caster.u.getPos()
+//		dummy = new Fx(pos.withZ(usamaHeight), caster.u.getFacing(), )
+
+endpackage

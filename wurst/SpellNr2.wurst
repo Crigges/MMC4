@@ -1,0 +1,71 @@
+package SpellNr2
+
+
+import Fx
+import Main
+import ChannelAbilityPreset
+import ClosureEvents
+
+@compiletime function createSpell()
+	var def = new ChannelAbilityPreset('ramQ', 10)
+	def.setLevels(1)
+	def.removeChannelProperties(true)
+	def.setHotkeyNormal("Q")
+	def.presetButtonPosNormal(0, 2)
+	def.setTooltipNormal(1, "Firemissle [Q]")
+	def.setTooltipNormalExtended(1, "Fires a Missle, which inflicts a huge knockback")
+	def.setIconNormal("ReplaceableTextures\\CommandButtons\\BTNDizzy.blp")
+	def.presetTargetTypes(Targettype.PTARGET)
+	def.presetFollowThroughTime((int i) -> 0)
+	def.setName("FireMissle")
+	def.setLevelSkipRequirement(0)
+	def.setRequiredLevel(0)
+	def.setCooldown(1, 2)
+	def.setCastRange(1, 1000)
+	def.setManaCost(1, 0)
+	
+init
+	onPointCast('ramQ', (unit u, int lvl, vec2 pos) -> new Normalmissle(units.get(u), pos))
+	
+public class Normalmissle
+
+	static constant real knockbackFactor = 50
+	static constant real missleRadius = 80
+	static constant real missleRange = 900
+	static constant real missleSpeed = 30
+	static constant real missleHeight = 20
+	
+	Fx dummy
+	vec2 speed
+	Unit owner
+	timer t
+	real distance = missleRange
+	
+
+	construct(Unit caster, vec2 target)
+		owner = caster
+		vec2 pos = caster.u.getPos()
+		angle ang = pos.angleTo(target)
+		dummy = new Fx(pos.withZ(missleHeight), ang, "Abilities\\Weapons\\Mortar\\MortarMissile.mdl")
+		speed = vec2(0,0).polarOffset(ang, missleSpeed)
+		t = getTimer()
+			..setData(this castTo int)
+			..startPeriodic(ANIMATION_PERIOD, () -> GetExpiredTimer().getData()	castTo thistype.move())
+			
+	
+	function move()
+		dummy.setXY(dummy.getPos2() + speed)
+		ENUM_GROUP.enumUnitsInRange(dummy.getPos2(), missleRadius)
+		for unit u in ENUM_GROUP
+			if u.getOwner().isEnemyOf(owner.u.getOwner())
+				units.get(u).addKnock(vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()), knockbackFactor))
+				destroy this
+				return		
+		distance -= missleSpeed
+		if distance <= 0
+			destroy this
+	ondestroy
+		destroy dummy
+		t.release()
+		
+endpackage

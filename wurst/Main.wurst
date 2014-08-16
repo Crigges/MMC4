@@ -15,7 +15,9 @@ package Main
 	
 	function createHero(player p, vec2 pos, real angle) returns Unit
 		unit u = CreateUnit(p, 'h000', pos.x, pos.y, angle)
-		u.addAbility('rami')
+		u.addAbility('ramD')
+		u.addAbility('ramQ')
+		u.addAbility('ramW')
 		return new Unit(u)
 		
 	function handleDeath()
