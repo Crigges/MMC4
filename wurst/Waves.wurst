@@ -1,0 +1,44 @@
+package Waves
+
+import ClosureTimers
+import Main
+import UnitMove
+
+int wave = 1
+Wave array waves
+
+public function next()
+	waves[wave].start()
+	wave++
+	if wave > 10
+		print("You WON!")
+		doAfter(2, () -> PauseGameOn())
+	
+public abstract class Wave
+
+	abstract function start()
+	
+init
+	waves[1] = () -> startWave(20, 20, 1.2, 1, 0.03)
+	waves[2] = () -> startWave(100, 2, 2, 1.08, 0.03)
+	doAfter(5, () -> next())
+	
+	
+	
+function startWave(int hp, int count, real scale, real mass, real speed)
+	SetPlayerHandicap(Player(12), hp / 100)
+	doPeriodicallyCounted(0.5, count, (CallbackCounted cb) -> begin
+		getIcelord(scale, mass, speed)
+	end)
+	doAfter(count * 0.5, () -> begin
+		MoveUnit.spawnEnded = true
+	end)
+	
+function getIcelord(real scale, real mass, real speed) returns MoveUnit
+	return new MoveUnit(new Unit(CreateUnit(Player(12), 'h001', getSpawnX(), getSpawnY(), 0), mass), speed, scale)
+	
+function getSpawnX() returns real
+	return gg_rct_Gebiet_000.getCenterX() + GetRandomReal(-100, 100)
+	
+function getSpawnY() returns real
+	return gg_rct_Gebiet_000.getCenterY() + GetRandomReal(-100, 100)

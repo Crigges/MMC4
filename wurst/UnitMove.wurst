@@ -3,18 +3,22 @@ import Main
 import LinkedListModule
 import ClosureTimers
 import Fx
+import initlater Waves
 
 public class MoveUnit
+	static boolean spawnEnded = true
 	use LinkedListModule
 	Unit u
 	real speed = 0.1
 	real speedInc
+	static int count = 0
 	
 	construct(Unit u, real speedInc, real scale)
 		doAfter(0.1, () -> SetUnitAnimationByIndex(u.u, 2))
 		u.u.setScale(scale)
 		this.speedInc = speedInc
 		this.u = u
+		count++
 		
 	static function move()
 		SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, 2500, 0)
@@ -48,13 +52,12 @@ public class MoveUnit
 			
 	ondestroy
 		destroy u
+		count--
+		if count <= 0 and spawnEnded
+			spawnEnded = false
+			print("Wave completet, next wave in 10sec")
+			doAfter(10, () -> next())
 			
 init
 	getTimer().startPeriodic(0.3, function MoveUnit.move)
-	doPeriodically(1, (CallbackPeriodic cb) -> begin
-		if gg_unit_hcas_0028 == null
-			print("null")
-		new MoveUnit(new Unit(CreateUnit(Player(12), 'h001', gg_rct_Gebiet_000.getCenterX() + GetRandomReal(-200, 200), gg_rct_Gebiet_000.getCenterY() + GetRandomReal(-200, 200), 0)), 0.13, 1)
-	end)
-	
 
