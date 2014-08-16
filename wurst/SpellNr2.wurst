@@ -21,7 +21,7 @@ import ClosureEvents
 	def.setLevelSkipRequirement(0)
 	def.setRequiredLevel(0)
 	def.setCooldown(1, 2)
-	def.setCastRange(1, 1000)
+	def.setCastRange(1, 10000)
 	def.setManaCost(1, 0)
 	
 init
@@ -29,9 +29,9 @@ init
 	
 public class Normalmissle
 
-	static constant real knockbackFactor = 50
+	static constant real knockbackFactor = 60
 	static constant real missleRadius = 80
-	static constant real missleRange = 900
+	static constant real missleRange = 2000
 	static constant real missleSpeed = 30
 	static constant real missleHeight = 20
 	
@@ -57,7 +57,7 @@ public class Normalmissle
 		dummy.setXY(dummy.getPos2() + speed)
 		ENUM_GROUP.enumUnitsInRange(dummy.getPos2(), missleRadius)
 		for unit u in ENUM_GROUP
-			if u.getOwner().isEnemyOf(owner.u.getOwner())
+			if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive()
 				units.get(u).addKnock(vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()), knockbackFactor))
 				destroy this
 				return		

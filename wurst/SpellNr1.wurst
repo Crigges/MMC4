@@ -19,7 +19,7 @@ import Main
 	def.setName("Conductor")
 	def.setLevelSkipRequirement(0)
 	def.setRequiredLevel(0)
-	def.setCooldown(1, 2)
+	def.setCooldown(1, 5)
 	def.setCastRange(1, 10000)
 	def.setManaCost(1, 0)
 		
@@ -27,7 +27,7 @@ init
 	onPointCast('ramD', (unit u, int lvl, vec2 pos) -> new Conductor(u, pos))
 
 public class Conductor
-	static constant real range = 900
+	static constant real range = 1500
 	static constant real missleRadius = 80
 	static constant real missleHeight = 80
 	static constant real missleSpeed = 30

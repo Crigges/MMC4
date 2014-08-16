@@ -10,7 +10,7 @@ import Fx
 	def.setLevels(1)
 	def.removeChannelProperties(true)
 	def.setHotkeyNormal("W")
-	def.presetButtonPosNormal(0, 2)
+	def.presetButtonPosNormal(1, 2)
 	def.setTooltipNormal(1, "Stomp [W]")
 	def.setTooltipNormalExtended(1, "Stomps to the ground, causing a huge knockback around the caster")
 	def.setIconNormal("ReplaceableTextures\\CommandButtons\\BTNEarthquake.blp")
@@ -19,8 +19,8 @@ import Fx
 	def.setName("Stomp")
 	def.setLevelSkipRequirement(0)
 	def.setRequiredLevel(0)
-	def.setCooldown(1, 2)
-	def.setCastRange(1, 1000)
+	def.setCooldown(1, 9)
+	def.setCastRange(1, 10000)
 	def.setManaCost(1, 0)
 	
 init
@@ -39,8 +39,8 @@ class Stomp
 		dummy = new Fx(caster.u.getPos().withZ(dummyHeight), caster.u.getFacingAngle(), "Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdl")
 		ENUM_GROUP.enumUnitsInRange(caster.u.getPos(), stompRange)
 		for unit u in ENUM_GROUP
-			if u.getOwner().isEnemyOf(caster.u.getOwner())
-				real knockbackrelativ = (caster.u.getPos().distToVec(u.getPos()) - (stompRange)).abs() / 3
+			if u.getOwner().isEnemyOf(caster.u.getOwner()) and u.isAlive()
+				real knockbackrelativ = (caster.u.getPos().distToVec(u.getPos()) - (stompRange)).abs() / 7
 				units.get(u).addKnock(vec2(0,0).polarOffset(caster.u.getPos().angleTo(u.getPos()), knockbackFactor * knockbackrelativ))
 		t = getTimer()
 			..setData(this castTo int)

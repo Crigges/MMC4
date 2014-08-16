@@ -10,7 +10,7 @@ package Main
 	public HashMap<unit, Unit> units = new HashMap<unit, Unit>()
 	public force allPlayer = CreateForce()
 	public trigger death = CreateTrigger()..addAction(function handleDeath)
-	public int lives = 20
+	public int lives = 10000
 	public leaderboard lb
 	
 	function createHero(player p, vec2 pos, real angle) returns Unit
