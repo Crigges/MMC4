@@ -22,7 +22,7 @@ package Main
 		u.addAbility('ramR')
 		u.addAbility('ramF')
 		u.addEffect("Abilities\\Weapons\\PhoenixMissile\\Phoenix_Missile_mini.mdl", "chest")
-		return new Unit(u)
+		return new Unit(u, 1)
 		
 	function handleDeath()
 		Unit h = units.get(GetTriggerUnit())
@@ -39,11 +39,13 @@ package Main
 		use LinkedListModule
 		Unit lastCollision
 		unit u
+		real mass = 1
 		vec2 startPos
 		vec2 knock = vec2(0, 0)
 		
-		construct(unit u)
+		construct(unit u, real mass)
 			this.u = u
+			this.mass = mass
 			units.put(u, this)
 			startPos = u.getPos()
 			
@@ -96,7 +98,7 @@ package Main
 				unit u = FirstOfGroup(g)
 				if u != null and curr.lastCollision != units.get(u)
 					curr.collision(units.get(u))
-				curr.knock = curr.knock * 0.95
+				curr.knock = curr.knock * (0.95 * (2 - curr.mass))
 				curr = curr.next
 				DestroyGroup(g)
 				
