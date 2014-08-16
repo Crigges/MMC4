@@ -2,18 +2,61 @@ package SpellNr4
 
 import Main
 import Fx
+import ChannelAbilityPreset
+import ClosureEvents
 
-
+@compiletime function createSpell()
+	var def = new ChannelAbilityPreset('ramE', 10)
+	def.setLevels(1)
+	def.removeChannelProperties(true)
+	def.setHotkeyNormal("E")
+	def.presetButtonPosNormal(0, 2)
+	def.setTooltipNormal(1, "Bomb [E]")
+	def.setTooltipNormalExtended(1, "Sets a Bomb to the Ground, which explodes after three seconds")
+	def.setIconNormal("ReplaceableTextures\\CommandButtons\\BTNWallOfFire.blp")
+	def.presetTargetTypes(Targettype.NOTARGET)
+	def.presetFollowThroughTime((int i) -> 0)
+	def.setName("Bomb")
+	def.setLevelSkipRequirement(0)
+	def.setRequiredLevel(0)
+	def.setCooldown(1, 2)
+	def.setCastRange(1, 1000)
+	def.setManaCost(1, 0)
+	
+init
+	onPointCast('ramE', (unit u, int lvl, vec2 pos) -> new UsamaBinLaden(units.get(u)))
+	
 class UsamaBinLaden
 	
 	static constant real usamaHeight = 50
+	static constant real usamaRadius = 500
+	static constant real usamaFactor = 20
 	
 	Unit caster
 	Fx dummy
+	timer t
 	
-//	construct(Unit caster)
-//		this.caster = caster
-//		vec2 pos = caster.u.getPos()
-//		dummy = new Fx(pos.withZ(usamaHeight), caster.u.getFacing(), )
+	construct(Unit caster)
+		this.caster = caster
+		vec2 pos = caster.u.getPos()
+		dummy = new Fx(pos.withZ(usamaHeight), caster.u.getFacingAngle(), "Abilities\\Weapons\\LordofFlameMissile\\LordofFlameMissile.mdl")
+		t = getTimer()
+			..setData(this castTo int)
+			..start(3, () -> GetExpiredTimer().getData()	castTo thistype.usamaExplode())
+		
+		
+	function usamaExplode()
+		ENUM_GROUP.enumUnitsInRange(dummy.getPos2(), usamaRadius)
+		for unit u in ENUM_GROUP
+			if u.getOwner().isEnemyOf(caster.u.getOwner())
+				real knockbackrelativ = (caster.u.getPos().distToVec(u.getPos()) - (usamaRadius)).abs() / 300
+				units.get(u).addKnock(vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()) - 180..asAngleDegrees(), usamaFactor * knockbackrelativ))
+		dummy.setScale(4)
+		dummy.flash("war3mapImported\\FlameBomb.mdx")
+		destroy this
 
+	ondestroy
+		destroy dummy
+		t.release()
+	
 endpackage

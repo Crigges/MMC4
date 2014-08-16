@@ -29,21 +29,22 @@ init
 class Stomp
 	
 	Fx dummy
+	timer t
 	
 	static constant real knockbackFactor = 1
 	static constant real stompRange = 800
 	static constant real dummyHeight = 20
 	
 	construct(Unit caster)
-		dummy = new Fx(caster.u.getPos().withZ(dummyHeight), caster.u.getFacingAngle(), "Abilities\\Spells\\Orc\\AncestralSpirit\\AncestralSpiritCaster.mdl")
+		dummy = new Fx(caster.u.getPos().withZ(dummyHeight), caster.u.getFacingAngle(), "Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdl")
 		ENUM_GROUP.enumUnitsInRange(caster.u.getPos(), stompRange)
 		for unit u in ENUM_GROUP
 			if u.getOwner().isEnemyOf(caster.u.getOwner())
 				real knockbackrelativ = (caster.u.getPos().distToVec(u.getPos()) - (stompRange)).abs() / 3
 				units.get(u).addKnock(vec2(0,0).polarOffset(caster.u.getPos().angleTo(u.getPos()), knockbackFactor * knockbackrelativ))
-		timer t = getTimer()
-				..setData(this castTo int)
-				..start(3, () -> GetExpiredTimer().getData()	castTo thistype.destroyDummy())
+		t = getTimer()
+			..setData(this castTo int)
+			..start(3, () -> GetExpiredTimer().getData() castTo thistype.destroyDummy())
 
 
 	function destroyDummy()
@@ -51,5 +52,6 @@ class Stomp
 		
 	ondestroy
 		destroy dummy
+		t.release()
 
 endpackage

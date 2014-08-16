@@ -1,0 +1,75 @@
+package SpellNr5
+
+
+import Fx
+import Main
+import ChannelAbilityPreset
+import ClosureEvents
+import ClosureTimers
+
+@compiletime function createSpell()
+	var def = new ChannelAbilityPreset('ramF', 10)
+	def.setLevels(1)
+	def.removeChannelProperties(true)
+	def.setHotkeyNormal("F")
+	def.presetButtonPosNormal(3, 1)
+	def.setTooltipNormal(1, "SlowMissle [F]")
+	def.setTooltipNormalExtended(1, "Fires a Missle, which slows the unit")
+	def.setIconNormal("ReplaceableTextures\\CommandButtons\\BTNSlow.blp")
+	def.presetTargetTypes(Targettype.PTARGET)
+	def.presetFollowThroughTime((int i) -> 0)
+	def.setName("SlowMissle")
+	def.setLevelSkipRequirement(0)
+	def.setRequiredLevel(0)
+	def.setCooldown(1, 2)
+	def.setCastRange(1, 1000)
+	def.setManaCost(1, 0)
+	
+init
+	onPointCast('ramF', (unit u, int lvl, vec2 pos) -> new SlowMissle(units.get(u), pos))
+	
+public class SlowMissle
+
+	static constant real knockbackFactor = 50
+	static constant real missleRadius = 80
+	static constant real missleRange = 900
+	static constant real missleSpeed = 30
+	static constant real missleHeight = 20
+	static constant real slowDauer = 1000
+	static constant real slowFaktor = 0.8
+	
+	Fx dummy
+	vec2 speed
+	Unit owner
+	timer t
+	real distance = missleRange
+	
+
+	construct(Unit caster, vec2 target)
+		owner = caster
+		vec2 pos = caster.u.getPos()
+		angle ang = pos.angleTo(target)
+		dummy = new Fx(pos.withZ(missleHeight), ang, "Abilities\\Weapons\\Mortar\\MortarMissile.mdl")
+		speed = vec2(0,0).polarOffset(ang, missleSpeed)
+		t = getTimer()
+			..setData(this castTo int)
+			..startPeriodic(ANIMATION_PERIOD, () -> GetExpiredTimer().getData()	castTo thistype.move())
+			
+	
+	function move()
+		dummy.setXY(dummy.getPos2() + speed)
+		ENUM_GROUP.enumUnitsInRange(dummy.getPos2(), missleRadius)
+		for unit u in ENUM_GROUP
+			if u.getOwner().isEnemyOf(owner.u.getOwner())
+					doPeriodicallyTimed(0.03, 3, (CallbackCounted a) -> begin 
+						units.get(u).knock = units.get(u).knock * slowFaktor
+					end)
+					destroy this
+		distance -= missleSpeed
+		if distance <= 0
+			destroy this
+	ondestroy
+		destroy dummy
+		t.release()
+		
+endpackage

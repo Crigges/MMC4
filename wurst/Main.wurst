@@ -18,6 +18,10 @@ package Main
 		u.addAbility('ramD')
 		u.addAbility('ramQ')
 		u.addAbility('ramW')
+		u.addAbility('ramE')
+		u.addAbility('ramR')
+		u.addAbility('ramF')
+		u.addEffect("Abilities\\Weapons\\PhoenixMissile\\Phoenix_Missile_mini.mdl", "chest")
 		return new Unit(u)
 		
 	function handleDeath()

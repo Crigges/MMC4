@@ -1,0 +1,44 @@
+package SpellNr6
+
+import Main
+import Fx
+import ClosureTimers
+import ChannelAbilityPreset
+import ClosureEvents
+
+@compiletime function createSpell()
+	var def = new ChannelAbilityPreset('ramR', 10)
+	def.setLevels(1)
+	def.removeChannelProperties(true)
+	def.setHotkeyNormal("R")
+	def.presetButtonPosNormal(0, 2)
+	def.setTooltipNormal(1, "Dash [R]")
+	def.setTooltipNormalExtended(1, "Dashes to the target location")
+	def.setIconNormal("ReplaceableTextures\\CommandButtons\\BTNInvisibility.blp")
+	def.presetTargetTypes(Targettype.PTARGET)
+	def.presetFollowThroughTime((int i) -> 0)
+	def.setName("Dash")
+	def.setLevelSkipRequirement(0)
+	def.setRequiredLevel(0)
+	def.setCooldown(1, 2)
+	def.setCastRange(1, 1000)
+	def.setManaCost(1, 0)
+	
+init
+	onPointCast('ramR', (unit u, int lvl, vec2 pos) -> new Dash(units.get(u), pos))
+	
+class Dash
+	
+	static constant real speedyspeed = 50
+	static constant real lnockback = 50
+	
+	Unit owner
+	
+	construct(Unit u, vec2 target)
+		owner = u
+		vec2 pos = u.u.getPos()
+		u.addKnock(vec2(0,0).polarOffset(pos.angleTo(target),speedyspeed))
+		destroy this
+
+endpackage
+
