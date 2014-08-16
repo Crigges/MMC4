@@ -2,31 +2,59 @@ package UnitMove
 import Main
 import LinkedListModule
 import ClosureTimers
+import Fx
 
 public class MoveUnit
 	use LinkedListModule
 	Unit u
 	real speed = 0.1
+	real speedInc
 	
-	construct(Unit u)
-		doAfter(0.1, () -> SetUnitAnimationByIndex(u.u, 12))
+	construct(Unit u, real speedInc, real scale)
+		doAfter(0.1, () -> SetUnitAnimationByIndex(u.u, 2))
+		u.u.setScale(scale)
+		this.speedInc = speedInc
 		this.u = u
 		
 	static function move()
+		SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, 2500, 0)
 		MoveUnit m = first
 		while m != null
 			m.u.addKnock(vec2(0, 0).polarOffset(m.u.u.getPos().angleTo(gg_unit_hcas_0028.getPos()), m.speed))
 			m.u.u.setFacing(m.u.u.getPos().angleTo(gg_unit_hcas_0028.getPos()))
 			m.u.u.setTimeScale(m.speed / 4)
-			m.speed += 0.04
+			m.speed += m.speedInc
+			if GetTerrainType(m.u.u.getX(), m.u.u.getY()) == 'Dlvc'
+				real hp = m.u.u.getHP() - 1
+				if hp < 1
+					nullTimer(() -> begin 
+						destroy m
+					end)
+				else
+					m.u.u.setHP(hp)
+			if gg_unit_hcas_0028.getPos().distToVec(m.u.u.getPos()) < 400
+				nullTimer(() -> begin 
+					destroy m
+					Fx fx = new Fx(gg_unit_hcas_0028.getPos(), 0..asAngleDegrees(), "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdl")..setScale(4)
+					doAfter(5, () -> destroy fx)
+					lives--
+					LeaderboardSetItemValue(lb, 0, lives)
+					if lives < 0
+						gg_unit_hcas_0028.kill()
+						print("You Lost")
+						doAfter(2, () -> PauseGameOn())
+				end)
 			m = m.next
 			
+	ondestroy
+		destroy u
+			
 init
-	SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, 2500, 0)
 	getTimer().startPeriodic(0.3, function MoveUnit.move)
-	doPeriodically(5, (CallbackPeriodic cb) -> begin
+	doPeriodically(1, (CallbackPeriodic cb) -> begin
 		if gg_unit_hcas_0028 == null
 			print("null")
-		new MoveUnit(new Unit(CreateUnit(Player(12), 'h001', gg_rct_Gebiet_000.getCenterX() + GetRandomReal(-200, 200), gg_rct_Gebiet_000.getCenterY() + GetRandomReal(-200, 200), 0)))
+		new MoveUnit(new Unit(CreateUnit(Player(12), 'h001', gg_rct_Gebiet_000.getCenterX() + GetRandomReal(-200, 200), gg_rct_Gebiet_000.getCenterY() + GetRandomReal(-200, 200), 0)), 0.13, 1)
 	end)
 	
+

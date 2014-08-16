@@ -10,8 +10,8 @@ package Main
 	public HashMap<unit, Unit> units = new HashMap<unit, Unit>()
 	public force allPlayer = CreateForce()
 	public trigger death = CreateTrigger()..addAction(function handleDeath)
-	int lives = 20
-	leaderboard lb
+	public int lives = 20
+	public leaderboard lb
 	
 	function createHero(player p, vec2 pos, real angle) returns Unit
 		unit u = CreateUnit(p, 'h000', pos.x, pos.y, angle)
@@ -93,6 +93,10 @@ package Main
 				curr.knock = curr.knock * 0.95
 				curr = curr.next
 				DestroyGroup(g)
+				
+		ondestroy
+			u.addAbility(LOCUST_ID)
+			u.kill()
 
 	init
 		death.registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
@@ -114,7 +118,7 @@ package Main
 		lb = CreateLeaderboard()
 		LeaderboardSetLabel(lb, "Lives")
 		PlayerSetLeaderboard(Player(0), lb)
-		LeaderboardAddItem(lb, GetPlayerName(Player(0)), lives, Player(0))
+		LeaderboardAddItem(lb, "Remaining", lives, Player(0))
 		LeaderboardDisplay(lb, true)
 		LeaderboardResizeBJ(lb)
 
