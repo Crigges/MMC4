@@ -19,8 +19,8 @@ import Main
 	def.setName("Conductor")
 	def.setLevelSkipRequirement(0)
 	def.setRequiredLevel(0)
-	def.setCooldown(1, 5)
-	def.setCastRange(1, 1000)
+	def.setCooldown(1, 2)
+	def.setCastRange(1, 10000)
 	def.setManaCost(1, 0)
 		
 init
@@ -30,8 +30,8 @@ public class Conductor
 	static constant real range = 900
 	static constant real missleRadius = 80
 	static constant real missleHeight = 80
-	static constant real missleSpeed = 10
-	static constant real knockbackFactor = 20
+	static constant real missleSpeed = 30
+	static constant real knockbackFactor = 40
 	Fx dummy
 	vec2 speed
 	unit owner
